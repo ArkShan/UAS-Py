@@ -91,12 +91,13 @@ def closeDb():
 # fungsi view index() untuk menampilkan data dari database
 @app.route('/admin')
 def admin():
-        cursor  =mysql.connection.cursor()
+        openDb()
         container = []
         cursor.execute('SELECT * FROM tb_user')
         results = cursor.fetchall()
         for data in results:
-         container.append(data)
+            container.append(data)
+        closeDb()
         return render_template('admin.html', container=container)
 
 # fungsi view tambah() untuk membuat form tambah
@@ -116,6 +117,7 @@ def tambah():
         return redirect(url_for('admin'))
     else:
         return render_template('tambah.html')
+
         # fungsi untuk menghapus data
 @app.route('/hapus/<id>',methods=['GET','POST'])
 def hapus(id):
@@ -124,19 +126,20 @@ def hapus(id):
     conn.commit()
     closeDb()
     return redirect(url_for('admin'))
+
         #fungsi view edit() untuk form edit
 @app.route('/edit/<id>', methods=['GET','POST'])
 def edit(id):
     openDb()
-    
     cursor.execute('SELECT * FROM tb_user WHERE id=%s', [id,])
     data = cursor.fetchone()
     if request.method == 'POST':
         id = request.form['id']
         username = request.form['username']
         password = request.form['password']
+
         sql = "UPDATE tb_user SET username=%s, password=%s WHERE id =%s"
-        val = (id,username, password)
+        val = (username, password, id)
         cursor.execute(sql, val)
         conn.commit()
         closeDb()
